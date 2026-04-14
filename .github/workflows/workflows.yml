@@ -43,3 +43,13 @@ jobs:
 
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Deploy to EC2 via SSM
+      run: |
+        aws ssm send-command \
+          --document-name "AWS-RunShellScript" \
+          --targets "Key=tag:Namespace,Values=st8-ASG" \
+          --parameters 'commands=[
+              "aws s3 sync s3://${{ secrets.S3_BUCKET_NAME }}/html /home/ec2-user/nginx/html --delete"      
+              ]' \
+          --region ${{ secrets.AWS_REGION }}

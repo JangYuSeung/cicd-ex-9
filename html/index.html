@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ST8 CICD 배포 현황</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .badge {
+      background: #22d3ee22;
+      border: 1px solid #22d3ee55;
+      color: #22d3ee;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      color: #94a3b8;
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      max-width: 700px;
+      margin-bottom: 2.5rem;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.2rem;
+    }
+    .card .label {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+    .card .value {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    .value.green { color: #4ade80; }
+    .value.blue  { color: #38bdf8; }
+    .value.purple{ color: #a78bfa; }
+    .value.amber { color: #fbbf24; }
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .step {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 6px 14px;
+      color: #cbd5e1;
+    }
+    .step.active {
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .arrow { color: #475569; }
+    .footer {
+      margin-top: 2.5rem;
+      font-size: 12px;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="badge">ST8 · AUTO SCALING CICD</div>
+  <h1>배포 파이프라인 동작 중</h1>
+  <p class="subtitle">GitHub Actions → ECR → ASG (Namespace: st8-ASG)</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="label">PIPELINE STATUS</div>
+      <div class="value green">SUCCESS</div>
+    </div>
+    <div class="card">
+      <div class="label">DEPLOY TARGET</div>
+      <div class="value blue">st8-ASG</div>
+    </div>
+    <div class="card">
+      <div class="label">IMAGE TAG</div>
+      <div class="value purple">latest</div>
+    </div>
+    <div class="card">
+      <div class="label">CONTAINER</div>
+      <div class="value amber">nginx:running</div>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="step">git push</div>
+    <div class="arrow">→</div>
+    <div class="step">S3 sync</div>
+    <div class="arrow">→</div>
+    <div class="step">ECR push</div>
+    <div class="arrow">→</div>
+    <div class="step active">SSM deploy</div>
+    <div class="arrow">→</div>
+    <div class="step">nginx serving</div>
+  </div>
+
+  <div class="footer">Served via ASG · Private Subnet · ALB</div>
+</body>
+</html>

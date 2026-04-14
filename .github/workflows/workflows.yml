@@ -50,6 +50,9 @@ jobs:
           --document-name "AWS-RunShellScript" \
           --targets "Key=tag:Namespace,Values=st8-ASG" \
           --parameters 'commands=[
+              "sudo mkdir -p /home/ec2-user/nginx/html",
+              "sudo mkdir -p /home/ec2-user/nginx/conf.d",
+              "sudo chown -R ec2-user:ec2-user /home/ec2-user/nginx",
               "aws s3 sync s3://${{ secrets.S3_BUCKET_NAME }}/html /home/ec2-user/nginx/html --delete",
               "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}",
               "sudo docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}",

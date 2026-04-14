@@ -12,6 +12,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # AWS 자격 증명 구성 (ECR 로그인 및 S3 업로드에 필요)
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -19,6 +20,26 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    # S3에 정적 파일 업로드 (html 폴더 전체를 S3 버킷의 html 폴더로 동기화)
     - name: Upload Config and Assets to S3
       run: |
         aws s3 sync ./html s3://${{ secrets.S3_BUCKET_NAME }}/html --delete
+    
+    # ECR 로그인
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # ECR에 도커 이미지 빌드 및 푸시
+    - name: Build and push Docker image to ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ github.sha }} # 커밋 해시를 이미지 태그로 사용. 커밋 해시란: 각 커밋마다 생성되는 식별 값.
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest # latest 태그도 함께 푸시
+
+
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
